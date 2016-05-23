@@ -1,10 +1,11 @@
 # Created by .ignore support plugin (hsz.mobi)
-.idea
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+
+.idea/
 
 # C extensions
 *.so
@@ -90,3 +91,4 @@ ENV/
 # Rope project settings
 .ropeproject
 
+.idea
