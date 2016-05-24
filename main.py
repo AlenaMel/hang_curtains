@@ -170,13 +170,13 @@ def show_frame():
     h1, w1 = frame.shape[:2]
     h2, w2 = img.shape[:2]
     # create empty matrix
-    roir = cv2.resize(img, (167, 232), cv.CV_INTER_AREA)
+    roir = cv2.resize(img, ((x4-x1),(y4-y1)) , cv.CV_INTER_AREA) # (167, 232), cv.CV_INTER_AREA)
     img2 = np.zeros((h1, w1, channels), np.uint8)
     img2[0:h1, 0:w1, :3] = [255, 255, 255]
     # vis = np.zeros((max(h1, h2), w1,3), np.uint8)
     # combine 2 images
-    x_offset = 330
-    y_offset = 5
+    x_offset = x1 # 330
+    y_offset = y1 # 5
     img2[y_offset:y_offset + roir.shape[0], x_offset:x_offset + roir.shape[1]] = roir
     # vis[:h1, :w1,:3] = frame
     # vis[:50,:50,:3] = img
@@ -195,7 +195,7 @@ def show_frame():
     # minisize = (frame.shape[1] / 4, frame.shape[0] / 4)
     # mframe = cv2.resize(frame, minisize)
     # cv2.rectangle(frame, (150, 150), (350, 280), (0, 255, 0), 3)
-    cv2.rectangle(frame, (x1, y1), (x4, y4), (0, 255, 0), 3)
+    #cv2.rectangle(frame, (x1, y1), (x4, y4), (0, 255, 0), 3)
     cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
     img = Image.fromarray(cv2image)
     imgtk = ImageTk.PhotoImage(image=img)
