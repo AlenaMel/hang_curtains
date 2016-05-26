@@ -4,26 +4,28 @@
 import os, cv2
 import cv2.cv as cv
 import numpy as np
+#from Tkinter.ttk import *
 from tkinter.ttk import *
 import Tkinter as tk
-from Tkinter import *
-# from myBoolean import *
+#import Tkinter.Widget
+#from Tkinter.ttk import *
+#import Tkinter.ttk as ttk
+#import pyttk
 from dialog import *
 from PIL import Image, ImageTk
 import Image, ImageTk
+import curtain
 
-list1 = ["10.jpg", "big", "mosaic.jpg"]
+list1 = ["10.jpg", "big", "mosaic1.jpg", "mosaic.jpg"]
 
-x1 = 150
-y1 = 150
-x2 = 350
-y2 = 150
-x3 = 150
-y3 = 280
-x4 = 350
-y4 = 280
-xr = 167
-yr = 232
+x1 = 330 #150
+y1 = 6 #150
+x2 = 497 #350
+y2 = 6 #150
+x3 = 330 #150
+y3 = 238#280
+x4 = 497#350
+y4 = 238#280
 
 
 # класс главного окна
@@ -42,43 +44,44 @@ class main:
         self.laby2 = Label(self.fra1, text='Y').grid(row=1, column=7)
         self.lab2 = Label(self.fra1, text='Top left   ').grid(row=2, column=1)
         self.var_x1 = IntVar()
-        self.var_x1.set(150)
+        self.var_x1.set(x1)
         self.sb_x1 = Spinbox(self.fra1, from_=1, to=1000, textvariable=self.var_x1, width=10,
                              command=self.chang_rect).grid(row=2, column=2)
         self.var_y1 = IntVar()
-        self.var_y1.set(150)
+        self.var_y1.set(y1)
         self.sb_y1 = Spinbox(self.fra1, from_=1, to=1000, textvariable=self.var_y1, width=10,
                              command=self.chang_rect).grid(row=2, column=3)
         self.lab3 = Label(self.fra1, text='Top right   ').grid(row=2, column=5)
         self.var_x2 = IntVar()
-        self.var_x2.set(350)
+        self.var_x2.set(x2)
         self.sb_x2 = Spinbox(self.fra1, from_=1, to=1000, textvariable=self.var_x2, width=10,
                              command=self.chang_rect).grid(row=2, column=6)
         self.var_y2 = IntVar()
-        self.var_y2.set(150)
+        self.var_y2.set(y2)
         self.sb_y2 = Spinbox(self.fra1, from_=1, to=1000, textvariable=self.var_y2, width=10,
                              command=self.chang_rect).grid(row=2, column=7)
         self.lab4 = Label(self.fra1, text='Bottom left   ').grid(row=3, column=1)
         self.var_x3 = IntVar()
-        self.var_x3.set(150)
+        self.var_x3.set(x3)
         self.sb_x3 = Spinbox(self.fra1, from_=1, to=1000, textvariable=self.var_x3, width=10,
                              command=self.chang_rect).grid(row=3, column=2)
         self.var_y3 = IntVar()
-        self.var_y3.set(280)
+        self.var_y3.set(y3)
         self.sb_y3 = Spinbox(self.fra1, from_=1, to=1000, textvariable=self.var_y3, width=10,
                              command=self.chang_rect).grid(row=3, column=3)
         self.lab5 = Label(self.fra1, text='Bottom right   ').grid(row=3, column=5)
         self.var_x4 = IntVar()
-        self.var_x4.set(350)
+        self.var_x4.set(x4)
         sb_x4 = Spinbox(self.fra1, from_=1, to=1000, textvariable=self.var_x4, width=10,
                         command=self.chang_rect).grid(row=3, column=6)
         self.var_y4 = IntVar()
-        self.var_y4.set(280)
+        self.var_y4.set(y4)
         self.sb_y4 = Spinbox(self.fra1, from_=1, to=1000, textvariable=self.var_y4, width=10,
                              command=self.chang_rect).grid(row=3, column=7)
         self.lab6 = Label(self.fra1, text='file   ').grid(row=4, column=1)
         self.ent = Entry(self.fra1, width=50, bd=3).grid(row=4, column=2, columnspan=4)
         self.combobox = Combobox(self.fra1, values=list1, height=3, width=15, state='readonly').grid(row=4, column=6)
+        #self.combobox.bind('<<ComboboxSelected>>', self.get_selected)
         self.lab7 = Label(self.fra1, text='Scale method').grid(row=5, column=1)
         self.var_scale = IntVar()
         self.var_scale.set(0)
@@ -120,8 +123,11 @@ class main:
         y3 = self.var_y3.get()
         x4 = self.var_x4.get()
         y4 = self.var_y4.get()
-        xr = x4 - x1
-        yr = y4 - y1
+
+    def get_selected(self):
+        global temp_name, current
+        temp_name = self.combobox.get()
+        current = self.combobox.current()
 
     def openDialog(self):
         self.dialog = dialog(self.master)
@@ -139,10 +145,7 @@ class main:
             self.master.destroy()
 
 
-
-            # создание окна
-
-
+# создание окна
 root = Tk()
 # Set up GUI
 # window = tk.Tk()  #Makes main window
@@ -153,7 +156,7 @@ root = Tk()
 imageFrame = tk.Frame(root, width=600, height=500)
 imageFrame.grid(row=8, column=0, padx=10, pady=2)
 
-# Capture video frames
+# Capture frames
 lmain = tk.Label(imageFrame)
 lmain.grid(row=8, column=0)
 
@@ -164,13 +167,15 @@ def show_frame():
     # _, frame = cap.read()
     # frame = cv2.flip(frame, 1)
     frame = cv2.imread('373.jpg')
-    img = cv2.imread('10.jpg')
+    #img = cv2.imread('10.jpg')
+    imgc = curtain.Curtain('10.jpg')
     rows, cols, channels = frame.shape
     roi = np.zeros((rows, cols, channels), dtype=np.uint8)
     h1, w1 = frame.shape[:2]
-    h2, w2 = img.shape[:2]
+    #h2, w2 = img.shape[:2]
     # create empty matrix
-    roir = cv2.resize(img, ((x4-x1),(y4-y1)) , cv.CV_INTER_AREA) # (167, 232), cv.CV_INTER_AREA)
+    # roir = imgc.fillrec(((x4-x1),334))#(y4-y1)))#cv2.resize(img, ((x4-x1),(y4-y1)) , cv.CV_INTER_AREA) # (167, 232), cv.CV_INTER_AREA)
+    roir = imgc.fillrec(((y4-y1),(x4-x1)))
     img2 = np.zeros((h1, w1, channels), np.uint8)
     img2[0:h1, 0:w1, :3] = [255, 255, 255]
     # vis = np.zeros((max(h1, h2), w1,3), np.uint8)
@@ -180,6 +185,7 @@ def show_frame():
     img2[y_offset:y_offset + roir.shape[0], x_offset:x_offset + roir.shape[1]] = roir
     # vis[:h1, :w1,:3] = frame
     # vis[:50,:50,:3] = img
+
     ###############################################################
     # version with transparency
     rows, cols, channels = img2.shape
