@@ -10,7 +10,7 @@ import Tkinter as tk
 #import Tkinter.Widget
 #from Tkinter.ttk import *
 #import Tkinter.ttk as ttk
-#import pyttk
+import ttk
 from dialog import *
 from PIL import Image, ImageTk
 import Image, ImageTk
@@ -20,17 +20,20 @@ list1 = ["10.jpg", "big", "mosaic1.jpg", "mosaic.jpg"]
 
 x1 = 330 #150
 y1 = 6 #150
-x2 = 497 #350
+x2 = 498 #350
 y2 = 6 #150
 x3 = 330 #150
 y3 = 238#280
-x4 = 497#350
+x4 = 498#350
 y4 = 238#280
+temp_name = ''
+current = -1
 
 
 # класс главного окна
 class main:
     def __init__(self, master):
+        global var_trans
         self.master = master
         self.master.title('Hang curtains')
         self.master.geometry('800x600+200+150')
@@ -82,15 +85,22 @@ class main:
         self.ent = Entry(self.fra1, width=50, bd=3).grid(row=4, column=2, columnspan=4)
         self.combobox = Combobox(self.fra1, values=list1, height=3, width=15, state='readonly').grid(row=4, column=6)
         #self.combobox.bind('<<ComboboxSelected>>', self.get_selected)
+        self.var_temp = IntVar()
+        self.var_temp.set(-1)
+        self.sb_temp = Spinbox(self.fra1, from_=-1, to=2, textvariable=self.var_temp, width=10,
+                               command=self.get_selected).grid(row=4, column=7)
         self.lab7 = Label(self.fra1, text='Scale method').grid(row=5, column=1)
         self.var_scale = IntVar()
         self.var_scale.set(0)
         rad0 = Radiobutton(self.fra1, text="Resize", variable=self.var_scale, value=0).grid(row=5, column=2)
         rad1 = Radiobutton(self.fra1, text="Pyromids", variable=self.var_scale, value=1).grid(row=5, column=3)
         self.lab7 = Label(self.fra1, text='Opening%').grid(row=5, column=5)
-        var_open = IntVar()
-        var_open.set(100)
-        self.sb_open = Spinbox(self.fra1, from_=1, to=100, textvariable=var_open, width=10).grid(row=5, column=6)
+        self.var_open = IntVar()
+        self.var_open.set(100)
+        self.sb_open = Spinbox(self.fra1, from_=1, to=100, textvariable=self.var_open, width=10).grid(row=5, column=6)
+        var_trans=IntVar()
+        self.check1=Checkbutton(self.fra1,text='Transparant',variable=var_trans, #onvalue=1,offvalue=0
+                                command=self.cbt).grid(row=5, column=7)
         # end bar
         #     img = cv2.imread('373.jpg')
         # #   h, w = img.shape[:2]
@@ -126,8 +136,21 @@ class main:
 
     def get_selected(self):
         global temp_name, current
-        temp_name = self.combobox.get()
-        current = self.combobox.current()
+        # temp_name = self.combobox.get()
+        # current = self.combobox.current()
+        current = self.var_temp.get()
+        if current == -1 :
+            temp_name = ''
+        elif  current == 0 :
+            temp_name = '10.jpg'
+        elif  current == 1 :
+            temp_name = 'big.jpg'
+        elif  current == 2 :
+            temp_name = 'mosaic.png'
+
+    def cbt(self):
+        print "variable is", var_trans.get()
+
 
     def openDialog(self):
         self.dialog = dialog(self.master)
@@ -161,43 +184,54 @@ lmain = tk.Label(imageFrame)
 lmain.grid(row=8, column=0)
 
 
-# cap = cv2.VideoCapture(0)
 def show_frame():
-    global x1, y1, x2, y2, x3, y3, x4, y4, xr, yr, img2
-    # _, frame = cap.read()
-    # frame = cv2.flip(frame, 1)
+    global x1, y1, x2, y2, x3, y3, x4, y4, img2, current, temp_name, var_trans
+    #current = 1
     frame = cv2.imread('373.jpg')
-    #img = cv2.imread('10.jpg')
-    imgc = curtain.Curtain('10.jpg')
-    rows, cols, channels = frame.shape
-    roi = np.zeros((rows, cols, channels), dtype=np.uint8)
-    h1, w1 = frame.shape[:2]
-    #h2, w2 = img.shape[:2]
-    # create empty matrix
-    # roir = imgc.fillrec(((x4-x1),334))#(y4-y1)))#cv2.resize(img, ((x4-x1),(y4-y1)) , cv.CV_INTER_AREA) # (167, 232), cv.CV_INTER_AREA)
-    roir = imgc.fillrec(((y4-y1),(x4-x1)))
-    img2 = np.zeros((h1, w1, channels), np.uint8)
-    img2[0:h1, 0:w1, :3] = [255, 255, 255]
-    # vis = np.zeros((max(h1, h2), w1,3), np.uint8)
-    # combine 2 images
-    x_offset = x1 # 330
-    y_offset = y1 # 5
-    img2[y_offset:y_offset + roir.shape[0], x_offset:x_offset + roir.shape[1]] = roir
-    # vis[:h1, :w1,:3] = frame
-    # vis[:50,:50,:3] = img
-
-    ###############################################################
-    # version with transparency
-    rows, cols, channels = img2.shape
-    roi = frame[0:rows, 0:cols]
-    img2gray = cv2.cvtColor(img2, cv.CV_BGR2GRAY)
-    ret, mask = cv2.threshold(img2gray, 220, 255, cv2.THRESH_BINARY_INV)
-    mask_inv = cv2.bitwise_not(mask)
-    img1_bg = cv2.bitwise_and(roi, roi, mask=mask_inv)
-    img2_fg = cv2.bitwise_and(img2, img2, mask=mask)
-    dst = cv2.add(img1_bg, img2_fg)
-    frame[0:rows, 0:cols] = dst
-    # #########################################################
+    if current == -1 :
+        cv2.rectangle(frame, (x1, y1), (x4, y4), (0, 255, 0), 3)
+    elif current >= 0:
+        imgc = curtain.Curtain(temp_name)
+        rows, cols, channels = frame.shape
+        roi = np.zeros((rows, cols, channels), dtype=np.uint8)
+        h1, w1 = frame.shape[:2]
+        #h2, w2 = img.shape[:2]
+        # create empty matrix
+        # roir = imgc.fillrec(((x4-x1),334))#(y4-y1)))#cv2.resize(img, ((x4-x1),(y4-y1)) , cv.CV_INTER_AREA) # (167, 232), cv.CV_INTER_AREA)
+        if current == 0:
+            roir = imgc.fillrec(((y4-y1),(x4-x1)))
+        elif current == 1:
+           roir = imgc.croprec(((y4-y1),(x4-x1)))
+        elif current == 2:
+            roir = imgc.mosaicrec(((y4-y1),(x4-x1)))
+        cv2.imshow("test",roir)
+        img2 = np.zeros((h1, w1, channels), np.uint8)
+        img2[0:h1, 0:w1, :3] = [255, 255, 255]
+        # vis = np.zeros((max(h1, h2), w1,3), np.uint8)
+        # combine 2 images
+        x_offset = x1 # 330
+        y_offset = y1 # 5
+        img2[y_offset:y_offset + roir.shape[0], x_offset:x_offset + roir.shape[1]] = roir
+        # vis[:h1, :w1,:3] = frame
+        # vis[:50,:50,:3] = img
+        #print var_trans.get()
+        if var_trans.get() == 1 :
+            ###############################################################
+            # # version with transparency
+            rows, cols, channels = img2.shape
+            roi = frame[0:rows, 0:cols]
+            img2gray = cv2.cvtColor(img2, cv.CV_BGR2GRAY)
+            ret, mask = cv2.threshold(img2gray, 220, 255, cv2.THRESH_BINARY_INV)
+            mask_inv = cv2.bitwise_not(mask)
+            img1_bg = cv2.bitwise_and(roi, roi, mask=mask_inv)
+            img2_fg = cv2.bitwise_and(img2, img2, mask=mask)
+            dst = cv2.add(img1_bg, img2_fg)
+            frame[0:rows, 0:cols] = dst
+            # #########################################################
+        else :
+            frame[y_offset:y_offset + roir.shape[0], x_offset:x_offset + roir.shape[1]] = roir
+        # dst = cv2.add(roi, img2)
+        # frame[0:rows, 0:cols] = dst
     # minisize = (frame.shape[1] / 4, frame.shape[0] / 4)
     # mframe = cv2.resize(frame, minisize)
     # cv2.rectangle(frame, (150, 150), (350, 280), (0, 255, 0), 3)

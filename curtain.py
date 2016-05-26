@@ -58,7 +58,7 @@ class Curtain:
             delt = h-(offset_h+hr)
             if (delt < 0) :
                 crop = roir[0:delt, 0:w ]
-                print delt
+                #print delt
                 # cv2.imshow("test",crop)
                 # cv2.waitKey(0)
                 y_offset = offset_h #abs(delt)
@@ -71,6 +71,43 @@ class Curtain:
             #     offset_h = offset_h +hr
         return img2
 
+    def croprec(self, rect):
+        height, width, depth = self.img.shape
+        h, w = rect
+        img2 = np.zeros((h, w, depth), np.uint8)
+        img2[0:h, 0:w, :3] = [255, 255, 255]
+        roir =  self.img
+        crop = roir[0:h, 0:w ]
+        img2[0:crop.shape[0], 0:crop.shape[1]] =crop
+        # cv2.imshow("test",img2)
+        # cv2.waitKey(0)
+        return img2
+
+    def mosaicrec(self, rect):
+        height, width, depth = self.img.shape
+        cv2.imshow("test1",self.img)
+        h, w = rect
+        offset_h = 0
+        offset_w = 0
+        img2 = np.zeros((h, w, depth), np.uint8)
+        img2[0:h, 0:w, :3] = [255, 255, 255]
+        roir =  self.img
+        iw = w/width
+        jh = h/height
+        print iw
+        print jh
+        #while ((offset_h+height) < h) :
+        while ((offset_w+width) <= w):#for i in range(1,iw):
+            while ((offset_h+height) <= h): #for j in range(1,jh):
+                x_offset = offset_w
+                y_offset = offset_h
+                img2[y_offset:y_offset + roir.shape[0], x_offset:x_offset + roir.shape[1]] = roir
+                offset_h = offset_h +height
+            offset_w = offset_w +width
+            offset_h = 0
+        cv2.imshow("test1",img2)
+        # cv2.waitKey(0)
+        return img2
 
 if __name__ == "__main__":
     pass
