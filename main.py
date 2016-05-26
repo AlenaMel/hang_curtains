@@ -4,12 +4,12 @@
 import os, cv2
 import cv2.cv as cv
 import numpy as np
-#from Tkinter.ttk import *
+# from Tkinter.ttk import *
 from tkinter.ttk import *
 import Tkinter as tk
-#import Tkinter.Widget
-#from Tkinter.ttk import *
-#import Tkinter.ttk as ttk
+# import Tkinter.Widget
+# from Tkinter.ttk import *
+# import Tkinter.ttk as ttk
 import ttk
 from dialog import *
 from PIL import Image, ImageTk
@@ -18,14 +18,14 @@ import curtain
 
 list1 = ["10.jpg", "big", "mosaic1.jpg", "mosaic.jpg"]
 
-x1 = 330 #150
-y1 = 6 #150
-x2 = 498 #350
-y2 = 6 #150
-x3 = 330 #150
-y3 = 238#280
-x4 = 498#350
-y4 = 238#280
+x1 = 330  # 150
+y1 = 6  # 150
+x2 = 498  # 350
+y2 = 6  # 150
+x3 = 330  # 150
+y3 = 238  # 280
+x4 = 498  # 350
+y4 = 238  # 280
 temp_name = ''
 current = -1
 
@@ -84,7 +84,7 @@ class main:
         self.lab6 = Label(self.fra1, text='file   ').grid(row=4, column=1)
         self.ent = Entry(self.fra1, width=50, bd=3).grid(row=4, column=2, columnspan=4)
         self.combobox = Combobox(self.fra1, values=list1, height=3, width=15, state='readonly').grid(row=4, column=6)
-        #self.combobox.bind('<<ComboboxSelected>>', self.get_selected)
+        # self.combobox.bind('<<ComboboxSelected>>', self.get_selected)
         self.var_temp = IntVar()
         self.var_temp.set(-1)
         self.sb_temp = Spinbox(self.fra1, from_=-1, to=2, textvariable=self.var_temp, width=10,
@@ -98,27 +98,10 @@ class main:
         self.var_open = IntVar()
         self.var_open.set(100)
         self.sb_open = Spinbox(self.fra1, from_=1, to=100, textvariable=self.var_open, width=10).grid(row=5, column=6)
-        var_trans=IntVar()
-        self.check1=Checkbutton(self.fra1,text='Transparant',variable=var_trans, #onvalue=1,offvalue=0
-                                command=self.cbt).grid(row=5, column=7)
+        var_trans = IntVar()
+        self.check1 = Checkbutton(self.fra1, text='Transparant', variable=var_trans,  # onvalue=1,offvalue=0
+                                  command=self.cbt).grid(row=5, column=7)
         # end bar
-        #     img = cv2.imread('373.jpg')
-        # #   h, w = img.shape[:2]
-        # #     image = Image.open("373.jpg")
-        #     photo = ImageTk.PhotoImage(img)
-        #     cv2.rectangle(img, (150, 150), (350, 280), (0, 255, 0), 3)
-        #     b,g,r = cv2.split(img)
-        #     img = cv2.merge((r,g,b))
-        #     label = Label(image=img)
-        #     label.image = img#photo # keep a reference!
-        #     label.grid(row=8,column=1)
-
-        # photo = PhotoImage(file = "warm_purple-logo.png" ).grid(row=4,column=1)
-        # self.ent = Entry( self.fra1, width=50, bd=3 ).grid(row=4,column=2)
-        # self.button = Button(self.master,
-        #                      text = 'dialog',
-        #                      command = self.openDialog)
-        # self.button.pack(side = BOTTOM)
         self.master.protocol('WM_DELETE_WINDOW',
                              self.exitMethod)
         self.master.mainloop()
@@ -139,18 +122,17 @@ class main:
         # temp_name = self.combobox.get()
         # current = self.combobox.current()
         current = self.var_temp.get()
-        if current == -1 :
+        if current == -1:
             temp_name = ''
-        elif  current == 0 :
+        elif current == 0:
             temp_name = '10.jpg'
-        elif  current == 1 :
+        elif current == 1:
             temp_name = 'big.jpg'
-        elif  current == 2 :
+        elif current == 2:
             temp_name = 'mosaic.png'
 
     def cbt(self):
         print "variable is", var_trans.get()
-
 
     def openDialog(self):
         self.dialog = dialog(self.master)
@@ -186,36 +168,28 @@ lmain.grid(row=8, column=0)
 
 def show_frame():
     global x1, y1, x2, y2, x3, y3, x4, y4, img2, current, temp_name, var_trans
-    #current = 1
+    # current = 1
     frame = cv2.imread('373.jpg')
-    if current == -1 :
+    if current == -1:
         cv2.rectangle(frame, (x1, y1), (x4, y4), (0, 255, 0), 3)
     elif current >= 0:
         imgc = curtain.Curtain(temp_name)
         rows, cols, channels = frame.shape
         roi = np.zeros((rows, cols, channels), dtype=np.uint8)
         h1, w1 = frame.shape[:2]
-        #h2, w2 = img.shape[:2]
-        # create empty matrix
-        # roir = imgc.fillrec(((x4-x1),334))#(y4-y1)))#cv2.resize(img, ((x4-x1),(y4-y1)) , cv.CV_INTER_AREA) # (167, 232), cv.CV_INTER_AREA)
         if current == 0:
-            roir = imgc.fillrec(((y4-y1),(x4-x1)))
+            roir = imgc.fillrec(((y4 - y1), (x4 - x1)))
         elif current == 1:
-           roir = imgc.croprec(((y4-y1),(x4-x1)))
+            roir = imgc.croprec(((y4 - y1), (x4 - x1)))
         elif current == 2:
-            roir = imgc.mosaicrec(((y4-y1),(x4-x1)))
-        cv2.imshow("test",roir)
+            roir = imgc.mosaicrec(((y4 - y1), (x4 - x1)))
+        cv2.imshow("test-main", roir)
         img2 = np.zeros((h1, w1, channels), np.uint8)
         img2[0:h1, 0:w1, :3] = [255, 255, 255]
-        # vis = np.zeros((max(h1, h2), w1,3), np.uint8)
-        # combine 2 images
-        x_offset = x1 # 330
-        y_offset = y1 # 5
+        x_offset = x1  # 330
+        y_offset = y1  # 5
         img2[y_offset:y_offset + roir.shape[0], x_offset:x_offset + roir.shape[1]] = roir
-        # vis[:h1, :w1,:3] = frame
-        # vis[:50,:50,:3] = img
-        #print var_trans.get()
-        if var_trans.get() == 1 :
+        if var_trans.get() == 1:
             ###############################################################
             # # version with transparency
             rows, cols, channels = img2.shape
@@ -228,14 +202,8 @@ def show_frame():
             dst = cv2.add(img1_bg, img2_fg)
             frame[0:rows, 0:cols] = dst
             # #########################################################
-        else :
+        else:
             frame[y_offset:y_offset + roir.shape[0], x_offset:x_offset + roir.shape[1]] = roir
-        # dst = cv2.add(roi, img2)
-        # frame[0:rows, 0:cols] = dst
-    # minisize = (frame.shape[1] / 4, frame.shape[0] / 4)
-    # mframe = cv2.resize(frame, minisize)
-    # cv2.rectangle(frame, (150, 150), (350, 280), (0, 255, 0), 3)
-    #cv2.rectangle(frame, (x1, y1), (x4, y4), (0, 255, 0), 3)
     cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
     img = Image.fromarray(cv2image)
     imgtk = ImageTk.PhotoImage(image=img)
