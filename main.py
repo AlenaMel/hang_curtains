@@ -131,6 +131,7 @@ class main:
         elif current == 2:
             temp_name = 'mosaic.png'
 
+    # Пока вместо combobox
     def cbt(self):
         print "variable is", var_trans.get()
 

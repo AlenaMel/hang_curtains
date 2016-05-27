@@ -71,7 +71,9 @@ class Curtain:
         img2 = np.zeros((h, w, depth), np.uint8)
         img2[0:h, 0:w, :3] = [255, 255, 255]
         roir = self.img
-        while ((offset_w + width) <= w):
+        deltw = width
+        delt = height
+        while ((offset_w+abs(deltw)) <= w):
             while ((offset_h + height) <= h):
                 x_offset = offset_w
                 y_offset = offset_h
@@ -80,22 +82,34 @@ class Curtain:
                 delt = h - (offset_h + height)
                 if (delt < 0):
                     crop = roir[0:delt, 0:w]
-                    print delt
-                    # cv2.imshow("test",crop)
-                    # cv2.waitKey(0)
                     y_offset = offset_h
                     img2[y_offset:y_offset + crop.shape[0], x_offset:x_offset + crop.shape[1]] = crop
+                else:
+                    delt = height
             offset_w = offset_w + width
             offset_h = 0
             deltw = w - (offset_w + width)
+            # print "deltw", deltw
+            # print "offset_w", offset_w
             if (deltw < 0):
-                crop = roir[0:h, 0:deltw]
-                print deltw
-                # cv2.imshow("test",crop)
-                # cv2.waitKey(0)
+                cropw = roir[0:h, 0:deltw]
                 x_offset = offset_w
                 y_offset = 0
-                img2[y_offset:y_offset + crop.shape[0], x_offset:x_offset + crop.shape[1]] = crop
+                img2[y_offset:y_offset + cropw.shape[0], x_offset:x_offset + cropw.shape[1]] = cropw
+                while ((offset_h + height) <= h):
+                    x_offset = offset_w
+                    y_offset = offset_h
+                    img2[y_offset:y_offset + cropw.shape[0], x_offset:x_offset + cropw.shape[1]] = cropw
+                    offset_h = offset_h + height
+                    delt = h - (offset_h + height)
+                    if (delt < 0):
+                        crop = cropw[0:delt, 0:w]
+                        y_offset = offset_h
+                        img2[y_offset:y_offset + crop.shape[0], x_offset:x_offset + crop.shape[1]] = crop
+                    else:
+                        delt = height
+            else:
+                deltw = width
         cv2.imshow("test1", img2)
         # cv2.waitKey(0)
         return img2
