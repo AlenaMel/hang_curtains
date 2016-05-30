@@ -4,13 +4,13 @@
 import os, cv2
 import cv2.cv as cv
 import numpy as np
-# from Tkinter.ttk import *
 from tkinter.ttk import *
+# from Tkinter.Ttk import *
 import Tkinter as tk
 # import Tkinter.Widget
 # from Tkinter.ttk import *
 # import Tkinter.ttk as ttk
-import ttk
+# import Tkinter.pyttk
 from dialog import *
 from PIL import Image, ImageTk
 import Image, ImageTk
@@ -18,14 +18,22 @@ import curtain
 
 list1 = ["10.jpg", "big", "mosaic1.jpg", "mosaic.jpg"]
 
-x1 = 330  # 150
-y1 = 6  # 150
-x2 = 498  # 350
-y2 = 6  # 150
-x3 = 330  # 150
-y3 = 238  # 280
-x4 = 498  # 350
-y4 = 238  # 280
+x1 = 316  # 150
+y1 = 42  # 150
+x2 = 560  # 350
+y2 = 42  # 150
+x3 = 316  # 150
+y3 = 290  # 280
+x4 = 560  # 350
+y4 = 290  # 280
+xt1 = 316  # 150
+yt1 = 96  # 150
+xt2 = 560  # 350
+yt2 = 40  # 150
+xt3 = 316  # 150
+yt3 = 274  # 280
+xt4 = 560  # 350
+yt4 = 290  # 280
 temp_name = ''
 current = -1
 
@@ -107,7 +115,8 @@ class main:
         self.master.mainloop()
 
     def chang_rect(self):
-        global x1, y1, x2, y2, x3, y3, x4, y4, xr, yr
+        global x1, y1, x2, y2, x3, y3, x4, y4
+        global xt1, yt1, xt2, yt2, xt3, yt3, xt4, yt4
         x1 = self.var_x1.get()
         y1 = self.var_y1.get()
         x2 = self.var_x2.get()
@@ -116,6 +125,14 @@ class main:
         y3 = self.var_y3.get()
         x4 = self.var_x4.get()
         y4 = self.var_y4.get()
+        xt1 = self.var_x1.get()
+        yt1 = self.var_y1.get()
+        xt2 = self.var_x2.get()
+        yt2 = self.var_y2.get()
+        xt3 = self.var_x3.get()
+        yt3 = self.var_y3.get()
+        xt4 = self.var_x4.get()
+        yt4 = self.var_y4.get()
 
     def get_selected(self):
         global temp_name, current
@@ -131,7 +148,6 @@ class main:
         elif current == 2:
             temp_name = 'mosaic.png'
 
-    # Пока вместо combobox
     def cbt(self):
         print "variable is", var_trans.get()
 
@@ -169,15 +185,25 @@ lmain.grid(row=8, column=0)
 
 def show_frame():
     global x1, y1, x2, y2, x3, y3, x4, y4, img2, current, temp_name, var_trans
+    global xt1, yt1, xt2, yt2, xt3, yt3, xt4, yt4
     # current = 1
-    frame = cv2.imread('373.jpg')
+    frame = cv2.imread('badfcb.jpg')
+    pts = np.array([[xt1, yt1], [xt2, yt2], [xt4, yt4], [xt3, yt3]], np.int32)
+    pts1 = np.array([[x1 - x1, y1 - y1], [x2 - x1, y2 - y1], [x4 - x1, y4 - y1], [x3 - x1, y3 - y1]], np.float32)
+    pts2 = np.array([[xt1 - x1, yt1 - y1], [xt2 - x1, yt2 - y1], [xt4 - x1, yt4 - y1], [xt3 - x1, yt3 - y1]],
+                    np.float32)
     if current == -1:
         cv2.rectangle(frame, (x1, y1), (x4, y4), (0, 255, 0), 3)
+        # Draw a polygon
+        # pts = np.array([[xt1,yt1],[xt2,yt2],[xt4,yt4],[xt3,yt3]], np.int32)
+        pts = pts.reshape((-1, 1, 2))
+        cv2.polylines(frame, [pts], True, (0, 255, 255))
     elif current >= 0:
         imgc = curtain.Curtain(temp_name)
         rows, cols, channels = frame.shape
         roi = np.zeros((rows, cols, channels), dtype=np.uint8)
         h1, w1 = frame.shape[:2]
+        # pts1 = np.array([[0,0],[w1,0],[w1,h1],[0,h1]], np.float32)
         if current == 0:
             roir = imgc.fillrec(((y4 - y1), (x4 - x1)))
         elif current == 1:
@@ -185,6 +211,15 @@ def show_frame():
         elif current == 2:
             roir = imgc.mosaicrec(((y4 - y1), (x4 - x1)))
         cv2.imshow("test-main", roir)
+        # roir = imgc.perspective(roir,pts1,pts2,250,244)#,((y4 - y1), (x4 - x1)))
+        # r = cv2.boundingRect(pts)
+        dst = np.zeros(((y4 - y1), (x4 - x1)), dtype=np.uint8)
+        # dst((x1, y1, cols, rows)).copyTo(frame)
+        # dst.copyTo(frame((x1, y1, cols, rows)))
+        # crop1 = frame[0:delt, 0:w ]
+        dst = frame[y1: y4, x1: x4]
+        cv2.imshow("test-main-dst", dst)
+        roir = imgc.perspective_t(pts1, pts2, roir, dst)
         img2 = np.zeros((h1, w1, channels), np.uint8)
         img2[0:h1, 0:w1, :3] = [255, 255, 255]
         x_offset = x1  # 330
@@ -196,7 +231,7 @@ def show_frame():
             rows, cols, channels = img2.shape
             roi = frame[0:rows, 0:cols]
             img2gray = cv2.cvtColor(img2, cv.CV_BGR2GRAY)
-            ret, mask = cv2.threshold(img2gray, 220, 255, cv2.THRESH_BINARY_INV)
+            ret, mask = cv2.threshold(img2gray, 210, 255, cv2.THRESH_BINARY_INV)
             mask_inv = cv2.bitwise_not(mask)
             img1_bg = cv2.bitwise_and(roi, roi, mask=mask_inv)
             img2_fg = cv2.bitwise_and(img2, img2, mask=mask)
@@ -205,6 +240,10 @@ def show_frame():
             # #########################################################
         else:
             frame[y_offset:y_offset + roir.shape[0], x_offset:x_offset + roir.shape[1]] = roir
+            # for c in range(0,2):
+            #     frame[y_offset:y_offset + roir.shape[0], x_offset:x_offset + roir.shape[1],c] =\
+            #     roir[:,:,c] * (roir[:,:,3]/255.0)+frame[y_offset:y_offset+roir.shape[0], x_offset:x_offset+roir.shape[1], c] * (1.0 - roir[:,:,3]/255.0)
+
     cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
     img = Image.fromarray(cv2image)
     imgtk = ImageTk.PhotoImage(image=img)
